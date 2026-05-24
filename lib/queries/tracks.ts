@@ -62,6 +62,34 @@ export function getTrackBySlug(slug: string) {
   return track ?? null
 }
 
+export type SectionStat = {
+  name: string
+  pct: number
+  stagesDone: number
+  totalStages: number
+}
+
+export function getTrackSectionStats(trackSlug: string): SectionStat[] {
+  const rows = db.all<{ name: string; stagesDone: number; totalTopics: number }>(sql`
+    SELECT s.name, s.sort_order,
+      COUNT(DISTINCT t.id) as totalTopics,
+      COALESCE(SUM(CASE WHEN ts.completed = 1 THEN 1 ELSE 0 END), 0) as stagesDone
+    FROM sections s
+    JOIN tracks tr ON tr.id = s.track_id
+    LEFT JOIN topics t ON t.section_id = s.id
+    LEFT JOIN topic_stages ts ON ts.topic_id = t.id
+    WHERE tr.slug = ${trackSlug}
+    GROUP BY s.id
+    ORDER BY s.sort_order
+  `)
+  return rows.map((r) => {
+    const totalStages = (r.totalTopics ?? 0) * 5
+    const stagesDone = r.stagesDone ?? 0
+    const pct = totalStages > 0 ? Math.round((stagesDone / totalStages) * 100) : 0
+    return { name: r.name, pct, stagesDone, totalStages }
+  })
+}
+
 export function getOverallStats() {
   const row = db.get<{ totalTopics: number; stagesDone: number }>(sql`
     SELECT

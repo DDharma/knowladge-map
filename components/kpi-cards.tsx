@@ -56,7 +56,7 @@ export function KpiCards({ totalTopics, masteredTopics, stagesDone, totalStages,
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-3 mb-5">
+    <div className="grid grid-cols-2 gap-3 mb-5 sm:grid-cols-4">
       {kpis.map((k) => (
         <div key={k.label} className="bg-[#14171F] border border-white/8 rounded-2xl p-5">
           <div className="flex items-center gap-2.5 mb-3">

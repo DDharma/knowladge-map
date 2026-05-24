@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { getTrackBySlug } from '@/lib/queries/tracks'
+import { getTrackBySlug, getTrackSectionStats } from '@/lib/queries/tracks'
 import { getTrackSections, getFilterCounts } from '@/lib/queries/topics'
 import type { FilterKey } from '@/lib/queries/topics'
 import { TopicFilterBar } from '@/components/topic-filter-bar'
 import { TopicSection } from '@/components/topic-section'
 import { KpiCards } from '@/components/kpi-cards'
+import { SectionBarChart } from '@/components/progress-charts'
 
 type Props = {
   params: Promise<{ track: string }>
@@ -22,6 +23,7 @@ export default async function TrackPage({ params, searchParams }: Props) {
 
   const sections = getTrackSections(slug, filter)
   const counts = getFilterCounts(slug)
+  const sectionStats = getTrackSectionStats(slug)
 
   // Compute per-track KPIs from unfiltered data
   const allSections = getTrackSections(slug, 'all')
@@ -35,7 +37,7 @@ export default async function TrackPage({ params, searchParams }: Props) {
   const isComingSoon = totalTopics === 0
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
         <span className="text-3xl">{track.icon}</span>
         <div>
@@ -61,6 +63,8 @@ export default async function TrackPage({ params, searchParams }: Props) {
             totalStages={totalStages}
             pct={pct}
           />
+
+          <SectionBarChart sections={sectionStats} trackName={track.name} />
 
           <div className="mb-5">
             <Suspense>

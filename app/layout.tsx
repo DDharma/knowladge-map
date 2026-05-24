@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { SidebarNav } from '@/components/sidebar-nav'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { AppSidebar } from '@/components/app-sidebar'
 import { getAllTracks } from '@/lib/queries/tracks'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
@@ -15,12 +17,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const tracks = getAllTracks()
 
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-[#0B0D12] text-white font-sans antialiased min-h-screen flex">
-        <SidebarNav tracks={tracks} />
-        <main className="flex-1 min-w-0 overflow-y-auto">
-          {children}
-        </main>
+    <html lang="en" className={`${inter.variable} dark`}>
+      <body className="bg-[#0B0D12] text-white font-sans antialiased">
+        <TooltipProvider>
+        <SidebarProvider defaultOpen={true}>
+          <AppSidebar tracks={tracks} />
+          <SidebarInset className="bg-[#0B0D12]">
+            <main>
+              {children}
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
+        </TooltipProvider>
       </body>
     </html>
   )

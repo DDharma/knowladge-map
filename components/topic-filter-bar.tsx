@@ -42,7 +42,7 @@ export function TopicFilterBar({ counts, trackSlug }: Props) {
           key={f.key}
           onClick={() => setFilter(f.key)}
           className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150',
+            'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border transition-all duration-150',
             active === f.key
               ? 'bg-white text-[#0B0D12] border-white'
               : 'bg-transparent border-white/15 text-white/50 hover:border-white/30 hover:text-white/80',
@@ -50,7 +50,7 @@ export function TopicFilterBar({ counts, trackSlug }: Props) {
         >
           {f.label}
           <span className={cn(
-            'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
+            'text-[10px] font-bold px-1.5 py-0.5',
             active === f.key ? 'bg-black/15 text-[#0B0D12]' : 'bg-white/8 text-white/30',
           )}>
             {counts[f.key]}
