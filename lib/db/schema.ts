@@ -20,7 +20,9 @@ export const sections = sqliteTable('sections', {
   dayRange:  text('day_range'),
   why:       text('why'),
   sortOrder: integer('sort_order').notNull().default(0),
-})
+}, (table) => [
+  uniqueIndex('sections_track_slug_unique').on(table.trackId, table.slug),
+])
 
 export const topics = sqliteTable('topics', {
   id:         integer('id').primaryKey({ autoIncrement: true }),
@@ -28,7 +30,9 @@ export const topics = sqliteTable('topics', {
   title:      text('title').notNull(),
   isCritical: integer('is_critical', { mode: 'boolean' }).notNull().default(false),
   sortOrder:  integer('sort_order').notNull().default(0),
-})
+}, (table) => [
+  uniqueIndex('topics_section_title_unique').on(table.sectionId, table.title),
+])
 
 export const topicStages = sqliteTable('topic_stages', {
   id:        integer('id').primaryKey({ autoIncrement: true }),
