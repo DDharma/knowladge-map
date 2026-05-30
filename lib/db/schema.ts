@@ -29,6 +29,7 @@ export const topics = sqliteTable('topics', {
   sectionId:  integer('section_id').notNull().references(() => sections.id, { onDelete: 'cascade' }),
   title:      text('title').notNull(),
   isCritical: integer('is_critical', { mode: 'boolean' }).notNull().default(false),
+  active:     integer('active', { mode: 'boolean' }).notNull().default(true),
   sortOrder:  integer('sort_order').notNull().default(0),
 }, (table) => [
   uniqueIndex('topics_section_title_unique').on(table.sectionId, table.title),

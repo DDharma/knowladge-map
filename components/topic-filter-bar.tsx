@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all',             label: 'All Topics' },
+  { key: 'active',          label: 'Studying' },
+  { key: 'skipped',         label: 'Skipped' },
   { key: 'critical',        label: 'Must Know' },
   { key: 'need-read',       label: 'Need Read' },
   { key: 'need-write',      label: 'Need Write' },

@@ -11,6 +11,7 @@ export type TopicWithStages = {
   id: number
   title: string
   isCritical: boolean
+  active: boolean
   sortOrder: number
   stages: StageMap
   mastered: boolean
@@ -36,6 +37,8 @@ export type SectionWithTopics = {
 
 export type FilterKey =
   | 'all'
+  | 'active'
+  | 'skipped'
   | 'need-read'
   | 'need-write'
   | 'need-understand'
@@ -96,6 +99,8 @@ export function getTrackSections(trackSlug: string, filter: FilterKey = 'all'): 
 function applyFilter(topicList: TopicWithStages[], filter: FilterKey): TopicWithStages[] {
   switch (filter) {
     case 'all':      return topicList
+    case 'active':   return topicList.filter((t) => t.active)
+    case 'skipped':  return topicList.filter((t) => !t.active)
     case 'mastered': return topicList.filter((t) => t.mastered)
     case 'critical': return topicList.filter((t) => t.isCritical)
     default: {
@@ -110,7 +115,7 @@ export function getFilterCounts(trackSlug: string): Record<FilterKey, number> {
   const allSections = getTrackSections(trackSlug, 'all')
   const allTopics = allSections.flatMap((s) => s.topics)
 
-  const filters: FilterKey[] = ['all', 'need-read', 'need-write', 'need-understand', 'need-revised', 'need-perfect', 'mastered', 'critical']
+  const filters: FilterKey[] = ['all', 'active', 'skipped', 'need-read', 'need-write', 'need-understand', 'need-revised', 'need-perfect', 'mastered', 'critical']
   const counts = {} as Record<FilterKey, number>
   for (const f of filters) {
     counts[f] = applyFilter(allTopics, f).length

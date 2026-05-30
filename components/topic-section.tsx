@@ -1,5 +1,6 @@
 import type { SectionWithTopics } from '@/lib/queries/topics'
 import { StageToggle } from './stage-toggle'
+import { TopicActiveCheckbox } from './topic-active-checkbox'
 import { cn } from '@/lib/utils'
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -106,11 +107,14 @@ export function TopicSection({ section, trackSlug }: Props) {
             key={topic.id}
             className={cn(
               'flex items-center gap-3 px-5 py-3 border-b border-white/5 last:border-0 transition-colors',
-              topic.mastered
+              !topic.active
+                ? 'opacity-40 hover:opacity-60'
+                : topic.mastered
                 ? 'bg-gradient-to-r from-green-400/5 via-green-400/2 to-transparent hover:from-green-400/8'
                 : 'hover:bg-white/3',
             )}
           >
+            <TopicActiveCheckbox topicId={topic.id} active={topic.active} trackSlug={trackSlug} />
             <span className={cn(
               'text-xs font-bold tabular-nums w-6 text-right shrink-0',
               topic.mastered ? 'text-green-400' : 'text-white/25',
@@ -119,7 +123,7 @@ export function TopicSection({ section, trackSlug }: Props) {
             </span>
             <span className={cn(
               'flex-1 text-sm leading-relaxed',
-              topic.mastered ? 'text-white' : 'text-white/60',
+              !topic.active ? 'text-white/60' : topic.mastered ? 'text-white' : 'text-white/60',
             )}>
               {topic.title}
               {topic.isCritical && (
