@@ -125,7 +125,24 @@ export function TopicSection({ section, trackSlug }: Props) {
               'flex-1 text-sm leading-relaxed',
               !topic.active ? 'text-white/60' : topic.mastered ? 'text-white' : 'text-white/60',
             )}>
-              {topic.title}
+              {topic.url ? (
+                <a
+                  href={topic.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:underline hover:text-blue-300 transition-colors"
+                >
+                  {topic.title}
+                </a>
+              ) : (
+                topic.title
+              )}
+              {topic.companies.length > 0 && (
+                <span className="ml-2 text-[11px] text-white/35">
+                  ({topic.companies.slice(0, 3).join(', ')}
+                  {topic.companies.length > 3 && ` +${topic.companies.length - 3}`})
+                </span>
+              )}
               {topic.isCritical && (
                 <span className="ml-2 text-[9px] font-bold tracking-wide uppercase text-blue-400/70 bg-blue-400/10 border border-blue-400/20 px-1.5 py-0.5 rounded">
                   Critical

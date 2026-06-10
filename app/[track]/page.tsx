@@ -1,30 +1,34 @@
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { getTrackBySlug } from '@/lib/queries/tracks'
-import { getTrackSections, getFilterCounts } from '@/lib/queries/topics'
+import { getTrackSections, getFilterCounts, getAllCompanies } from '@/lib/queries/topics'
 import type { FilterKey } from '@/lib/queries/topics'
+import { DSA_COMPANIES_TRACK_SLUG } from '@/lib/db/schema'
 import { TopicFilterBar } from '@/components/topic-filter-bar'
 import { TopicSection } from '@/components/topic-section'
 import { KpiCards } from '@/components/kpi-cards'
 
 type Props = {
   params: Promise<{ track: string }>
-  searchParams: Promise<{ filter?: string }>
+  searchParams: Promise<{ filter?: string; company?: string }>
 }
 
 export default async function TrackPage({ params, searchParams }: Props) {
   const { track: slug } = await params
-  const { filter: rawFilter } = await searchParams
+  const { filter: rawFilter, company: rawCompany } = await searchParams
   const filter = (rawFilter as FilterKey) || 'all'
+  const companySlugs = rawCompany ? rawCompany.split(',').filter(Boolean) : []
 
   const track = getTrackBySlug(slug)
   if (!track) notFound()
 
-  const sections = getTrackSections(slug, filter)
+  const sections = getTrackSections(slug, { filter, companySlugs })
   const counts = getFilterCounts(slug)
+  const isDsaCompanies = slug === DSA_COMPANIES_TRACK_SLUG
+  const companyOptions = isDsaCompanies ? getAllCompanies() : []
 
   // Compute per-track KPIs from unfiltered data
-  const allSections = getTrackSections(slug, 'all')
+  const allSections = getTrackSections(slug)
   const allTopics = allSections.flatMap((s) => s.topics)
   const totalTopics = allTopics.length
   const stagesDone = allTopics.reduce((a, t) => a + t.stagesDone, 0)
@@ -64,7 +68,12 @@ export default async function TrackPage({ params, searchParams }: Props) {
 
           <div className="mb-5">
             <Suspense>
-              <TopicFilterBar counts={counts} trackSlug={slug} />
+              <TopicFilterBar
+                counts={counts}
+                trackSlug={slug}
+                showDifficultyAndCompany={isDsaCompanies}
+                companyOptions={companyOptions}
+              />
             </Suspense>
           </div>
 

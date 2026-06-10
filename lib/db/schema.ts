@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, real, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 export const tracks = sqliteTable('tracks', {
@@ -30,9 +30,28 @@ export const topics = sqliteTable('topics', {
   title:      text('title').notNull(),
   isCritical: integer('is_critical', { mode: 'boolean' }).notNull().default(false),
   active:     integer('active', { mode: 'boolean' }).notNull().default(true),
+  url:        text('url'),
+  difficulty: text('difficulty', { enum: ['EASY', 'MEDIUM', 'HARD'] }),
   sortOrder:  integer('sort_order').notNull().default(0),
 }, (table) => [
   uniqueIndex('topics_section_title_unique').on(table.sectionId, table.title),
+  uniqueIndex('topics_section_url_unique').on(table.sectionId, table.url),
+])
+
+export const companies = sqliteTable('companies', {
+  id:   integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+})
+
+export const topicCompanies = sqliteTable('topic_companies', {
+  id:        integer('id').primaryKey({ autoIncrement: true }),
+  topicId:   integer('topic_id').notNull().references(() => topics.id, { onDelete: 'cascade' }),
+  companyId: integer('company_id').notNull().references(() => companies.id, { onDelete: 'cascade' }),
+  frequency: real('frequency'),
+}, (table) => [
+  uniqueIndex('topic_company_unique').on(table.topicId, table.companyId),
+  index('topic_companies_company_idx').on(table.companyId),
 ])
 
 export const topicStages = sqliteTable('topic_stages', {
@@ -49,7 +68,12 @@ export type Track = typeof tracks.$inferSelect
 export type Section = typeof sections.$inferSelect
 export type Topic = typeof topics.$inferSelect
 export type TopicStage = typeof topicStages.$inferSelect
+export type Company = typeof companies.$inferSelect
+export type TopicCompany = typeof topicCompanies.$inferSelect
 export type Stage = 'R' | 'W' | 'U' | 'Rv' | 'P'
+export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD'
+
+export const DSA_COMPANIES_TRACK_SLUG = 'dsa-companies'
 
 export const STAGES: Stage[] = ['R', 'W', 'U', 'Rv', 'P']
 export const STAGE_LABELS: Record<Stage, string> = {
